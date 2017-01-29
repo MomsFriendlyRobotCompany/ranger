@@ -12,6 +12,21 @@ This is what it was:
 
 [Axial Racing Wraith](http://www.axialracing.com/products/ax90018)
 
+## Research/Testing
+
+- This thing draws a lot of current, tried testing it with a battery pack I had
+  and it pulled so much current, it melted the leads off the pack.
+- In order to talk with the ESC, you need to first set it to full throttle and
+  then set it to min throttle for the ESC to work [ref](http://www.rototron.info/raspberry-pi-esc-motor-tutorial/)
+      
+      import pigpio   # not sure how good this is??
+      pi = pigpio.pi()
+      ESC_GPIO = 13  # ESC pwm set to RPi pin 13
+      pi.set_servo_pulsewidth(ESC_GPIO, 2000) # Maximum throttle.
+      sleep(2)
+      pi.set_servo_pulsewidth(ESC_GPIO, 1000) # Minimum throttle.
+      sleep(2)
+
 
 # Licenses
 
