@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#if 0
+#if 1
     #include <pigpio.h>
 #else
     // these are fake interfaces for testing on my linux desktop
@@ -39,13 +39,13 @@ http://abyz.me.uk/rpi/pigpio/cif.html#gpioServo
 
 
 bool run = true;
-const int NUM_GPIO = 4;
+const int NUM_GPIO = 1;
 const int MIN_WIDTH = 1000;  // 1000 usec or 1 msec
 const int MAX_WIDTH = 2000;  // 2000 usec
 const int STEP_SIZE = 10;
 
 int width[NUM_GPIO];
-int used[NUM_GPIO] = {22,23,24,25}; // BCM pins used
+int used[NUM_GPIO] = {18}; //{22,23,24,25}; // BCM pins used
 
 // int randint(int from, int to)
 // {
@@ -59,6 +59,13 @@ void stop(int signum)
    printf("<< caught signal: %d >>\n", signum);
 }
 
+void init(){
+  gpioServo(used[0], 1000);
+  time_sleep(2.0);
+  gpioServo(used[0], 1500);
+  time_sleep(2.0);
+}
+
 int main(int argc, char *argv[])
 {
    int i, g;
@@ -69,6 +76,8 @@ int main(int argc, char *argv[])
 
    printf("Sending servos pulses to GPIO");
    printf(", control C to stop.\n");
+
+   init();
 
    while(run){
       for (g=0; g<NUM_GPIO; g++){

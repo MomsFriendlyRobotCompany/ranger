@@ -23,5 +23,5 @@ else()
 endif()
 
 add_executable(esc esc.cpp)
-target_link_libraries(esc ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(esc ${CMAKE_THREAD_LIBS_INIT} pigpio)
 # target_link_libraries(esc pigpio)
