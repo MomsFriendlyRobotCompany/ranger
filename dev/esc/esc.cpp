@@ -64,6 +64,7 @@ void init(){
   time_sleep(2.0);
   gpioServo(used[0], 1500);
   time_sleep(2.0);
+  gpioServo(used[0], 0);
 }
 
 int main(int argc, char *argv[])
@@ -86,13 +87,13 @@ int main(int argc, char *argv[])
         printf(">> pin %d: %d\n", used[g], width[g]);
         width[g] += STEP_SIZE;
 
-        if ((width[g]<MIN_WIDTH) || (width[g]>MAX_WIDTH)){
+        if ((width[g]<MIN_WIDTH) || (width[g]>1500)){
             printf("** pin %d reset to min\n", used[g]);
            width[g] = MIN_WIDTH;
         }
       }
 
-      time_sleep(0.1);
+      time_sleep(0.5);
    }
 
    printf("\n*** shutting off everything ***\n");
