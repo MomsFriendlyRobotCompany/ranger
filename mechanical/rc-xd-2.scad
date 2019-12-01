@@ -62,7 +62,7 @@ module rail(){
     }
 }
 
-module frame2(){
+module frame(){
     // rails and screw holes for base plate
     rail();
     translate([0,-102,7]) rotate([180,0,0]) rail();
@@ -89,7 +89,7 @@ module frame2(){
     }
 }
 
-module suspension2(thick=10){
+module suspension(thick=10){
 
     dd = 30;
     sus = 77;
@@ -113,14 +113,66 @@ module suspension2(thick=10){
 }
 
 
-difference()
-{
-    union(){
-        frame2();
-        translate([65,-102/2,58]) suspension2();
-    }
+module bracket(){
+    difference()
+    {
+        union(){
+            frame();
+            translate([65,-102/2,58]) suspension();
+        }
 
-    translate([71-15/2+30/2-5,-102/2-20,62-2]) rotate([0,180,0]) M3NutVertical(10); // front right
-    translate([71-15/2+30/2-5,-102/2,62-2]) rotate([0,180,0]) M3NutVertical(10); // front center
-    translate([71-15/2+30/2-5,-102/2+20,62-2]) rotate([0,180,0]) M3NutVertical(10); // front left
+        translate([71-15/2+30/2-5,-102/2-20,62-2]) rotate([0,180,0]) M3NutVertical(10); // front right
+        translate([71-15/2+30/2-5,-102/2,62-2]) rotate([0,180,0]) M3NutVertical(10); // front center
+        translate([71-15/2+30/2-5,-102/2+20,62-2]) rotate([0,180,0]) M3NutVertical(10); // front left
+    }
 }
+
+// bracket();
+
+
+module handle(len=100) {
+    thick = 20;
+    rotate([90,0,0]) translate([0,0,-len/2])
+    difference(){
+        cylinder(d=thick, h=len);
+        translate([0,0,-5]) cylinder(d=thick/2, h=len+10);
+    }
+}
+
+module handlebar(){
+    handle();
+}
+
+/* handlebar(); */
+
+
+module plate(){
+    len = 165;
+    width = 65;
+    thick = 4;
+    translate([-len/2, -width/2, 0])
+    difference()
+    {
+        union() {
+            cube([len, width, thick]);
+            translate([15, width/2-100/2, 0]) cube([len-30,100,thick]);
+        }
+        // negative x-side
+        translate([8, width/2, 0]) M3(2);
+        translate([8, width/2+20, 0]) M3(2);
+        translate([8, width/2-20, 0]) M3(2);
+        // positive x-side
+        translate([len-8, width/2, 0]) M3(2);
+        translate([len-8, width/2+20, 0]) M3(2);
+        translate([len-8, width/2-20, 0]) M3(2);
+        // turret
+        translate([len-20, width/2+93/2, 2]) rotate([180,0,0]) M3NutVertical(12);
+        translate([len-20, width/2-93/2, 2]) rotate([180,0,0]) M3NutVertical(12);
+        translate([len-20-50, width/2, 2]) rotate([180,0,0]) M3NutVertical(12);
+    }
+    /* translate([-len/2+15, -100/2, 0]) cube([len-30,100,thick]); */
+    /* translate([-len/2+50, 0, 0]) scale([.4,1,1]) cylinder(d=100, h=thick); */
+}
+
+
+plate();
