@@ -74,6 +74,10 @@ module arch(){
     color("blue") import("stl/base-v2.stl");
 }
 
+module other(){
+    color("blue") import("stl/rc-xd-4-v1.stl");
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 /* module skidplatebolts(){
@@ -110,14 +114,14 @@ module arch(){
 } */
 
 module bumper(th, sf=0.3){
-    w = 102+7;
+    w = 102+7+7;
     difference(){
         union(){
-            translate([0,w/2+7/2,0]) scale([sf,1,1]) cylinder(d=w, h=th);
+            translate([0,w/2,0]) scale([sf,1,1]) cylinder(d=w, h=th);
             //translate([-17,(102+14)/2-20,5]) rotate([0,90,0]) screwhole(20);
         }
-        //translate([0,w/2,-2]) scale([sf-.05,1,1]) cylinder(d=w-14, h=th+3);
-        translate([0,-2, -2]) cube([20, w+5, 20]);
+        translate([0,w/2,-2]) scale([sf-.05,1,1]) cylinder(d=w-14-6, h=th+3);
+        translate([0,-2, -2]) cube([90, w+5, 20]);
 
         //translate([-17,(102+14)/2-20,5]) rotate([0,90,0]) screwhole(20);
         //translate([-17,(102+14)/2-20,5]) rotate([0,90,0]) cylinder(d=2.65, h=30);
@@ -174,19 +178,24 @@ module frameside(){
     {
         dia = 10;
         union(){
-            cube([200, w, h]); // main bar
-            translate([0,0,dia/2]) rotate([-90,0,0]) cylinder(d=10, h=102+7+7); // shocks
-            bumper(dia);
+            translate([30,0,0]) cube([200-60, w, h]); // main bar
+            translate([0,16,dia/2]) rotate([-90,0,0]) cylinder(d=10, h=85); // shocks
+            translate([30,0,0]) bumper(dia,.60);  // .63
+
+            // side mount holes
             translate([42+5,0,h+3]) rotate([-90,0,0]) boltholebrace(10);
-            /* translate([42+90+26,0,h+1.5]) rotate([-90,0,0]) screwhole(25); */
             translate([42+90+26-5,0,h+3]) rotate([-90,0,0]) boltholebrace(10);
-            /* translate([42+90+26-15,0,h]) cube([30,w,h]); */
+
+            // front mount holes
+            ww = 70;
+            xx = 20;
+            translate([-5,(102+7+7)/2-ww/2,0]) cube([10,ww,10]);
+            translate([-5,(102+7+7)/2+xx,h+3]) rotate([-90,0,-90]) boltholebrace(10);
+            translate([-5,(102+7+7)/2-xx,h+3]) rotate([-90,0,-90]) boltholebrace(10);
         }
         // shock screws
         translate([0,-2,dia/2]) rotate([-90,0,0]) cylinder(d=2.5, h=130);
         translate([200,-2,dia/2]) rotate([-90,0,0]) cylinder(d=2.5, h=130);
-        // top-down bolts
-        /* for (x = [65,135]) translate([x,w/2,4]) M3Nut(h, true); // mount pts on main bar */
     }
 
     // cross bar to other side, top down
@@ -222,7 +231,7 @@ module frame(){
 
     difference()
     {
-        translate([50,5,0]) cube([100,102+7,2]);
+        translate([51,5,0]) cube([98,102+7,2]);
         translate([100,(102)/2+7, -1]) cylinder(d=102,h=4);
 
         // holes to mount turrent ... right side
@@ -239,6 +248,8 @@ module frame(){
 /* bolthole(10); */
 
 frame();
+
+/* translate([0,0,-30]) other(); */
 /* {
     pos = 200/2 - (30+15+13);
     translate([pos, 0, -65-7]) color("purple") cube([90+26,7,7]);
