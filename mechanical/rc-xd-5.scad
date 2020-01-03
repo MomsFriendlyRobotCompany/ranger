@@ -177,9 +177,12 @@ module frameside(){
     difference()
     {
         dia = 10;
+        sl = 78;
         union(){
             translate([30,0,0]) cube([200-60, w, h]); // main bar
-            translate([0,16,dia/2]) rotate([-90,0,0]) cylinder(d=10, h=85); // shocks
+            /* translate([0,(102+14)/2-sl/2-8,dia/2]) rotate([-90,0,0]) color("red") cylinder(d=10,h=4); // shock joint
+            translate([0,(102+14)/2-sl/2-4,dia/2]) rotate([-90,0,0]) color("red") cylinder(d=5,h=4); // shock washer */
+            translate([0,(102+14)/2-sl/2,dia/2]) rotate([-90,0,0]) cylinder(d=10, h=sl); // shocks
             translate([30,0,0]) bumper(dia,.60);  // .63
 
             // side mount holes
