@@ -4,7 +4,7 @@
 
 **New, haven't done anything yet**
 
-Currently, I have only disassembled the truck. 
+Currently, I have only disassembled the truck.
 
 This is what it was:
 
@@ -14,31 +14,29 @@ This is what it was:
 
 ## Research/Testing
 
-- This thing draws a lot of current, tried testing it with a battery pack I had
-  and it pulled so much current, it melted the leads off the pack.
 - In order to talk with the ESC, you need to first set it to full throttle and
   then set it to min throttle for the ESC to work [ref](http://www.rototron.info/raspberry-pi-esc-motor-tutorial/)
-  
-	```python
-	import pigpio   # not sure how good this is over RPI.GPIO??
-	pi = pigpio.pi()
-	ESC_GPIO = 13  # ESC pwm set to RPi pin 13
-	pi.set_servo_pulsewidth(ESC_GPIO, 2000) # Maximum throttle.
-	sleep(2)
-	pi.set_servo_pulsewidth(ESC_GPIO, 1000) # Minimum throttle.
-	sleep(2)
-	```
+
+```python
+import pigpio   # not sure how good this is over RPI.GPIO??
+pi = pigpio.pi()
+ESC_GPIO = 13  # ESC pwm set to RPi pin 13
+pi.set_servo_pulsewidth(ESC_GPIO, 2000) # Maximum throttle.
+sleep(2)
+pi.set_servo_pulsewidth(ESC_GPIO, 1000) # Minimum throttle.
+sleep(2)
+```
 
 
 # Licenses
 
 **Note:** The software, hardware, and documentation are under different licenses.
 
-## Software
+# Software
 
-**The MIT License (MIT)**
+## The MIT License (MIT)
 
-Copyright (c) 2016 Kevin J. Walchko
+**Copyright (c) 2016 Kevin J. Walchko**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -57,7 +55,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## Hardware and Documentation
+# Hardware and Documentation
 
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
 	<img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
