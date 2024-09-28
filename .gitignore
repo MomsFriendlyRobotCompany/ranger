@@ -5,3 +5,10 @@ build
 ._*
 *.swp
 jupyter/
+
+gci_*
+picolib
+squaternion
+yivo
+
+
