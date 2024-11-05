@@ -5,11 +5,32 @@
 #include <stdlib.h> // rand
 #include <signal.h> // alarm
 
+#define __USE_SENSOR_LSM6DSOX__
+#define __USE_SENSOR_LIS3MDL__
+#define __USE_SENSOR_BMP390__
+
 #include "common.h"
 #include "colors.hpp"
 #include "serialcomm.hpp"
 
+#include <gciSensors.hpp>
+#include <common/messages.hpp>
+
 using namespace ipc;
+using namespace std;
+
+using namespace LSM6DSOX;
+using namespace BMP390;
+using namespace sensors;
+
+// using vec_t = gci::sensors::vec_t;
+// using quat_t = gci::sensors::quat_t;
+// using imu_t =  gci::sensors::imu_t;
+
+gciLSM6DSOX accel(1);
+gciBMP390 bmp(1);
+sensors::compfilter_t qcf(0.01f);
+
 
 volatile bool run = true;
 volatile bool read_imu = false;
@@ -42,6 +63,14 @@ int main() {
   s.open(1); // 1 msec timeout
   uint64_t start_time = get_timestamp();
 
+
+  while (true) {
+    uint8_t err = accel.init(ACCEL_RANGE_4_G, GYRO_RANGE_2000_DPS, RATE_208_HZ);
+    if (err == 0) break;
+    printf("accel error %d\n", int(err));
+    sensors::sleep_ms(1000);
+  }
+
   signal(SIGALRM, signal_func);
   ualarm(10000, 10000); // alarm initial and repeat
   signal(SIGTERM, signal_func);
@@ -72,7 +101,7 @@ int main() {
       s.sendto(msg, addr);
       // printf("%d\r", (int)imu.timestamp);
     }
-    else sleep_ms(1000);
+    else sensors::sleep_ms(1000);
   }
 
   printf("imu oooout!!\n");

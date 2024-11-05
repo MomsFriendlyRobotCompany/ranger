@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.28)
 project(ranger VERSION 2024.09.30.0 LANGUAGES CXX)
 
 
@@ -40,11 +40,11 @@ include(FetchContent)
 # )
 
 # squaterion ------------
-FetchContent_Declare(squaternion
-    GIT_REPOSITORY "https://github.com/MomsFriendlyRobotCompany/squaternion.git"
-    GIT_TAG "origin/master"
-    SOURCE_SUBDIR "cpp"
-)
+# FetchContent_Declare(squaternion
+#     GIT_REPOSITORY "https://github.com/MomsFriendlyRobotCompany/squaternion.git"
+#     GIT_TAG "origin/master"
+#     SOURCE_SUBDIR "cpp"
+# )
 
 # messages -------------
 # FetchContent_Declare(messages
@@ -73,10 +73,10 @@ FetchContent_Declare(squaternion
 #     GIT_TAG "origin/main"
 # )
 
-FetchContent_MakeAvailable(
-    squaternion
-    # ipc
-)
+# FetchContent_MakeAvailable(
+#     squaternion
+#     # ipc
+# )
 
 # Threads ---------------------------------------------------------
 find_package(Threads REQUIRED)
@@ -100,12 +100,15 @@ LIST(APPEND APPS
 foreach(MAIN ${APPS})
     add_executable(${MAIN} src/${MAIN}.cpp)
     target_include_directories(${MAIN} PUBLIC
-        ipc/src
+        ipc
         serialcomm
+        gciSensors
+        squaternions
     )
     target_link_libraries(${MAIN} PUBLIC
         # ipc
-        squaternion
+        # squaternion
+        i2c
         Threads::Threads
     )
 

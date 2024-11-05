@@ -1,5 +1,6 @@
 #pragma once
-#include "message.hpp"
+
+#include <gciSensors.hpp>
 
 constexpr uint16_t MEMORY_PORT = 9000;
 // constexpr uint16_t MEMORY_SET_PORT = 9100;
@@ -16,27 +17,15 @@ constexpr command_t GET_IMU  = 200;
 constexpr command_t GET_POSE = 201;
 constexpr command_t GET_GPS  = 202;
 
-struct __attribute__((packed)) vec_t {
-  float x,y,z;
-};
 
 struct __attribute__((packed)) point_t {
   float x, y;
 };
 
-struct __attribute__((packed)) quat_t {
-  float w,x,y,z;
-};
-
 struct __attribute__((packed)) pose_t {
-  vec_t position, velocity;
-  quat_t orientation;
-};
-
-struct __attribute__((packed)) imu_t {
-  vec_t a,g,m;
-  quat_t q;
-  uint32_t timestamp;
+  sensors::vec_t position;
+  sensors::vec_t velocity;
+  sensors::quat_t orientation;
 };
 
 struct __attribute__((packed)) lidar_t {
@@ -44,7 +33,13 @@ struct __attribute__((packed)) lidar_t {
   uint32_t timestamp;
 };
 
-using namespace ipc;
+struct __attribute__((packed)) imu_t {
+  sensors::vec_t a,g,m;
+  sensors::quat_t q;
+  float temperature;
+  bool ok;
+  uint32_t timestamp;
+};
 
 
 enum IPC_STATE: uint8_t {
