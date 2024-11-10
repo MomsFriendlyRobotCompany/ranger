@@ -18,7 +18,7 @@ killbg() {
 pids=$(jobs -p)
 
 # Wait for some time (e.g., 10 seconds)
-sleep 3
+sleep 5
 
 # Shut down the programs
 # kill $pids

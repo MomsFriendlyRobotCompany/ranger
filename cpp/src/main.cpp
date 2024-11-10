@@ -37,15 +37,15 @@ void process(uint16_t id, message_t& msg, inetaddr_t& client_addr) {
   switch (id) {
     case SET_IMU:
       sm.imu = ipc_unpack<imu_t>(msg);
-      printf("SET_IMU: %d\n", (int)sm.imu.timestamp);
+      // printf("SET_IMU: %d\n", (int)sm.imu.timestamp);
       break;
     case SET_POSE:
-      printf("SET_POSE\n");
+      // printf("SET_POSE\n");
       sm.pose = ipc_unpack<pose_t>(msg);
       break;
     case SET_LIDAR:
       sm.lidar = ipc_unpack<lidar_t>(msg);
-      printf("%sSET_LIDAR%s  %d\n", FG_CYAN, FG_RESET, (int)sm.lidar.timestamp);
+      // printf("%sSET_LIDAR%s  %d\n", FG_CYAN, FG_RESET, (int)sm.lidar.timestamp);
       break;
     case GET_IMU:
       reply = ipc_pack<imu_t>(GET_IMU,sm.imu);
@@ -66,6 +66,16 @@ int main() {
   signal(SIGTERM, signal_func);
   signal(SIGKILL, signal_func);
 
+  Buffer_t<10> buff;
+  buff.memset(22);
+  Buffer_t<10> b2;
+  b2 = buff;
+
+  if (b2[5] == 22) printf("good\n");
+  else printf("bad\n");
+
+  return 0;
+
   pid_t pid = getpid();
   printf(">> process[%d]\n", pid);
 
@@ -78,6 +88,8 @@ int main() {
   s.open(100); // timeout
   s.bind(addr);
   uint8_t buffer[MAX_MSG_SIZE];
+  uint32_t loop_cnt = 0;
+  uint64_t start_time = time_us();
 
   while (run) {
     inetaddr_t client_addr;
@@ -88,7 +100,17 @@ int main() {
       message_t m = get_msg(buffer, MAX_MSG_SIZE);
       uint16_t id = get_id(m);
       process(id, m, client_addr);
+
+      if (loop_cnt++ == 100) {
+        loop_cnt = 0;
+        printf("-----------------------------\n");
+        printf("Accels: %8.3f %8.3f %8.3f g\n", sm.imu.a.x, sm.imu.a.y, sm.imu.a.z);
+        printf("Gyros: %8.3f %8.3f %8.3f dps\n", sm.imu.g.x, sm.imu.g.y, sm.imu.g.z);
+        printf("Temperature: %5.1f C\n", sm.imu.temperature);
+        printf("Timestamp: %lu usec  Time: %6.3f\n", sm.imu.timestamp_us, time_sec(start_time));
+      }
     }
+
   }
 
   printf("Exiting ...\n");

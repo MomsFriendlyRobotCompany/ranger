@@ -37,13 +37,13 @@ int main() {
   ualarm(100000, 100000); // alarm initial and repeat
   signal(SIGTERM, signal_func);
 
-  uint64_t start_time = get_timestamp();
+  uint64_t start_time = ipc::time_us();
 
   while(run) {
     if (read_lidar) {
       read_lidar = false;
       lidar_t lidar;
-      lidar.timestamp = (uint32_t)(get_timestamp() - start_time);
+      lidar.timestamp_us = ipc::time_us() - start_time;
       for (size_t i=99; i > -1; --i) {
         lidar.points[i].x = 123.456;
         lidar.points[i].y = -123.456;

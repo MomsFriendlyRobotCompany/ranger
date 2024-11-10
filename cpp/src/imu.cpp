@@ -61,7 +61,6 @@ int main() {
   SerialPort sport;
   SocketUDP s;
   s.open(1); // 1 msec timeout
-  uint64_t start_time = get_timestamp();
 
 
   while (true) {
@@ -75,28 +74,24 @@ int main() {
   ualarm(10000, 10000); // alarm initial and repeat
   signal(SIGTERM, signal_func);
 
+  uint32_t start_time = 0;
+
   while(run) {
     if (read_imu) {
+      lsm6dsox_t i = accel.read();
+      if (i.ok == false) continue;
       read_imu = false;
+      if (start_time == 0) start_time = i.timestamp_us;
+
       // read IMU
       imu_t imu;
-      imu.a = vec_t{
-        random(-1,1),
-        random(-1,1),
-        random(-1,1)
-      };
-      imu.g = vec_t{
-        random(-.1,.1),
-        random(-.1,.1),
-        random(-.1,.1)
-      };
-      imu.m = vec_t{
-        random(-10,10),
-        random(-10,10),
-        random(-10,10)
-      };
+      imu.a = i.a;
+      imu.g = i.g;
+      // imu.m = i.m;
+      imu.temperature = i.temperature;
       imu.q = quat_t{1,0,0,0};
-      imu.timestamp = (uint32_t)(get_timestamp() - start_time);
+      imu.timestamp_us = i.timestamp_us - start_time;
+      // imu.timestamp = i.timestamp;
       message_t msg = ipc_pack<imu_t>(SET_IMU,imu);
       s.sendto(msg, addr);
       // printf("%d\r", (int)imu.timestamp);

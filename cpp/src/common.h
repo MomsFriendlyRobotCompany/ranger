@@ -30,7 +30,7 @@ struct __attribute__((packed)) pose_t {
 
 struct __attribute__((packed)) lidar_t {
   point_t points[100];
-  uint32_t timestamp;
+  uint64_t timestamp_us;
 };
 
 struct __attribute__((packed)) imu_t {
@@ -38,7 +38,7 @@ struct __attribute__((packed)) imu_t {
   sensors::quat_t q;
   float temperature;
   bool ok;
-  uint32_t timestamp;
+  uint64_t timestamp_us;
 };
 
 
