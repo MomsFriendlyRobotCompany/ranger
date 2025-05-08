@@ -1,257 +1,266 @@
 #pragma once
 
-#include <gciSensors.hpp>
+#include <stdint.h>
+// #include <signal.h> // alarm
+// #include <stdio.h> // printf
+// #include <stdlib.h>    // rand
+// #include <sys/types.h> // pid (type int)
+// #include <unistd.h>    // sleep, getpid()
 
-constexpr uint16_t MEMORY_PORT = 9000;
+
+constexpr uint16_t LOCAL_IMU_PORT = 9998;
+constexpr uint16_t LOCAL_LIDAR_PORT = 9999;
 // constexpr uint16_t MEMORY_SET_PORT = 9100;
 // constexpr uint16_t MEMORY_GET_PORT = 9200;
 
-using command_t = uint16_t;
+// using command_t               = uint16_t;
 
-constexpr command_t SET_IMU  = 100;
-constexpr command_t SET_POSE = 101;
-constexpr command_t SET_GPS  = 102;
-constexpr command_t SET_LIDAR = 103;
+// constexpr command_t SET_IMU   = 100;
+// constexpr command_t SET_POSE  = 101;
+// constexpr command_t SET_GPS   = 102;
+// constexpr command_t SET_LIDAR = 103;
 
-constexpr command_t GET_IMU  = 200;
-constexpr command_t GET_POSE = 201;
-constexpr command_t GET_GPS  = 202;
+// constexpr command_t GET_IMU   = 200;
+// constexpr command_t GET_POSE  = 201;
+// constexpr command_t GET_GPS   = 202;
 
+// struct __attribute__((packed)) point_t {
+//   float x, y;
+// };
 
-struct __attribute__((packed)) point_t {
-  float x, y;
-};
+// struct __attribute__((packed)) vec_t {
+//   float x, y, z;
+// };
 
-struct __attribute__((packed)) pose_t {
-  sensors::vec_t position;
-  sensors::vec_t velocity;
-  sensors::quat_t orientation;
-};
+// struct __attribute__((packed)) quat_t {
+//   float w, x, y, z;
+// };
 
-struct __attribute__((packed)) lidar_t {
-  point_t points[100];
-  uint64_t timestamp_us;
-};
+// struct __attribute__((packed)) pose_t {
+//   vec_t position;
+//   vec_t velocity;
+//   quat_t orientation;
+// };
 
-struct __attribute__((packed)) imu_t {
-  sensors::vec_t a,g,m;
-  sensors::quat_t q;
-  float temperature;
-  bool ok;
-  uint64_t timestamp_us;
-};
+// struct __attribute__((packed)) lidar_t {
+//   point_t points[100];
+//   uint64_t timestamp_us;
+// };
 
+// struct __attribute__((packed)) imu_t {
+//   vec_t a, g, m;
+//   quat_t q;
+//   float temperature;
+//   bool ok;
+//   uint64_t timestamp_us;
+// };
 
-enum IPC_STATE: uint8_t {
-  IPC_MAGIC1,
-  IPC_MAGIC2,
-  IPC_ID1,
-  IPC_ID2,
-  IPC_SIZE1,
-  IPC_SIZE2,
-  IPC_CRC,
-  IPC_PAYLOAD
-};
+// enum IPC_STATE: uint8_t {
+//   IPC_MAGIC1,
+//   IPC_MAGIC2,
+//   IPC_ID1,
+//   IPC_ID2,
+//   IPC_SIZE1,
+//   IPC_SIZE2,
+//   IPC_CRC,
+//   IPC_PAYLOAD
+// };
 
-static
-uint8_t calc_crc(const uint8_t* buffer, const size_t msg_size) {
-    // XOR all bytes in struct, but NOT ipc_header_t
-    uint64_t cs = 0;
-    for (size_t i = 0; i < msg_size; ++i) cs ^= buffer[i];
-    return (uint8_t)(cs & 0x000000FF);
-}
+// static
+// uint8_t calc_crc(const uint8_t* buffer, const size_t msg_size) {
+//     // XOR all bytes in struct, but NOT ipc_header_t
+//     uint64_t cs = 0;
+//     for (size_t i = 0; i < msg_size; ++i) cs ^= buffer[i];
+//     return (uint8_t)(cs & 0x000000FF);
+// }
 
-template<typename T>
-uint8_t calc_crc(T *msg) {
-  uint8_t *p = reinterpret_cast<uint8_t*>(msg);
-  uint64_t cs = 0;
-  size_t size = sizeof(T);
-  for (size_t i = 0; i < size; ++i) cs ^= p[i];
-  uint8_t crc = (uint8_t)(cs & 0x000000FF);
-  return crc;
-}
+// template<typename T>
+// uint8_t calc_crc(T *msg) {
+//   uint8_t *p = reinterpret_cast<uint8_t*>(msg);
+//   uint64_t cs = 0;
+//   size_t size = sizeof(T);
+//   for (size_t i = 0; i < size; ++i) cs ^= p[i];
+//   uint8_t crc = (uint8_t)(cs & 0x000000FF);
+//   return crc;
+// }
 
+// static
+// uint16_t get_id(ipc::message_t& buffer) {
+//   return uint16_t(buffer[2] + (buffer[3] << 8));
+// }
 
-static
-uint16_t get_id(ipc::message_t& buffer) {
-  return uint16_t(buffer[2] + (buffer[3] << 8));
-}
+// static
+// ipc::message_t get_msg(uint8_t* buffer, size_t buffer_size) {
+//   uint8_t state = IPC_MAGIC1;
+//   uint16_t size = 0;
+//   uint8_t crc = 0;
+//   size_t length = buffer_size;
+//   uint16_t id{0};
 
+//   for (size_t i=0; i<length; ++i) {
+//     uint8_t b = buffer[i];
+//     switch(state) {
+//       case IPC_MAGIC1:
+//         if (b == 0xff) state = IPC_MAGIC2;
+//         // printf("state: %d   index: %d  byte: %d\n", (int)state, (int)i,
+//         (int)b); break;
+//       case IPC_MAGIC2:
+//         if (b == 0xff) state = IPC_ID1;
+//         else state = IPC_MAGIC1;
+//         break;
+//       case IPC_ID1:
+//         id = b;
+//         state = IPC_ID2;
+//         break;
+//       case IPC_ID2:
+//         id += (b << 8);
+//         // printf("id: %d\n", (int)id);
+//         state = IPC_SIZE1;
+//         break;
+//       case IPC_SIZE1:
+//         size = b;
+//         state = IPC_SIZE2;
+//         break;
+//       case IPC_SIZE2:
+//         size += (b << 8);
+//         // printf("size: %d\n", (int)size);
+//         state = IPC_CRC;
+//         break;
+//       case IPC_CRC:
+//         crc = b;
+//         // printf("crc: %d\n", (int)crc);
+//         state = IPC_PAYLOAD;
+//         break;
+//       case IPC_PAYLOAD:
+//         uint8_t crc2 = calc_crc(&buffer[i], size-IPC_HEADER_SIZE);
+//         // printf("crc2: %d\n", (int)crc2);
+//         if (crc == crc2) {
+//           ipc::message_t ret(size);
+//           memcpy(ret.data(), &buffer[i-IPC_HEADER_SIZE], size);
 
+//           // pop off the bytes that have been checked and resize
+//           // buffer IF there are still bytes to check
+//           // size_t new_size = buffer.size() - (i-IPC_HEADER_SIZE+size);
+//           // if (new_size > 0) {
+//           //   uint8_t *tmp = new uint8_t[new_size];
+//           //   memcpy(tmp, &buffer[i-IPC_HEADER_SIZE+size], new_size);
+//           //   buffer.resize(new_size);
+//           //   memcpy(buffer.data(), tmp, new_size);
+//           //   delete[] tmp;
+//           // }
 
-static
-ipc::message_t get_msg(uint8_t* buffer, size_t buffer_size) {
-  uint8_t state = IPC_MAGIC1;
-  uint16_t size = 0;
-  uint8_t crc = 0;
-  size_t length = buffer_size;
-  uint16_t id{0};
+//           return std::move(ret);
+//         }
+//         else state = IPC_MAGIC1; // crap, start over
+//         break;
+//     }
+//   }
 
-  for (size_t i=0; i<length; ++i) {
-    uint8_t b = buffer[i];
-    switch(state) {
-      case IPC_MAGIC1:
-        if (b == 0xff) state = IPC_MAGIC2;
-        // printf("state: %d   index: %d  byte: %d\n", (int)state, (int)i, (int)b);
-        break;
-      case IPC_MAGIC2:
-        if (b == 0xff) state = IPC_ID1;
-        else state = IPC_MAGIC1;
-        break;
-      case IPC_ID1:
-        id = b;
-        state = IPC_ID2;
-        break;
-      case IPC_ID2:
-        id += (b << 8);
-        // printf("id: %d\n", (int)id);
-        state = IPC_SIZE1;
-        break;
-      case IPC_SIZE1:
-        size = b;
-        state = IPC_SIZE2;
-        break;
-      case IPC_SIZE2:
-        size += (b << 8);
-        // printf("size: %d\n", (int)size);
-        state = IPC_CRC;
-        break;
-      case IPC_CRC:
-        crc = b;
-        // printf("crc: %d\n", (int)crc);
-        state = IPC_PAYLOAD;
-        break;
-      case IPC_PAYLOAD:
-        uint8_t crc2 = calc_crc(&buffer[i], size-IPC_HEADER_SIZE);
-        // printf("crc2: %d\n", (int)crc2);
-        if (crc == crc2) {
-          ipc::message_t ret(size);
-          memcpy(ret.data(), &buffer[i-IPC_HEADER_SIZE], size);
+//   ipc::message_t ret;
+//   return std::move(ret);
+// }
 
-          // pop off the bytes that have been checked and resize
-          // buffer IF there are still bytes to check
-          // size_t new_size = buffer.size() - (i-IPC_HEADER_SIZE+size);
-          // if (new_size > 0) {
-          //   uint8_t *tmp = new uint8_t[new_size];
-          //   memcpy(tmp, &buffer[i-IPC_HEADER_SIZE+size], new_size);
-          //   buffer.resize(new_size);
-          //   memcpy(buffer.data(), tmp, new_size);
-          //   delete[] tmp;
-          // }
+// static
+// ipc::message_t get_msg(ipc::message_t& buffer) {
+//   uint8_t state = IPC_MAGIC1;
+//   uint16_t size = 0;
+//   uint8_t crc = 0;
+//   size_t length = buffer.size();
+//   uint16_t id{0};
 
-          return std::move(ret);
-        }
-        else state = IPC_MAGIC1; // crap, start over
-        break;
-    }
-  }
+//   for (size_t i=0; i<length; ++i) {
+//     uint8_t b = buffer[i];
+//     switch(state) {
+//       case IPC_MAGIC1:
+//         if (b == 0xff) state = IPC_MAGIC2;
+//         // printf("state: %d   index: %d  byte: %d\n", (int)state, (int)i,
+//         (int)b); break;
+//       case IPC_MAGIC2:
+//         if (b == 0xff) state = IPC_ID1;
+//         else state = IPC_MAGIC1;
+//         break;
+//       case IPC_ID1:
+//         id = b;
+//         state = IPC_ID2;
+//         break;
+//       case IPC_ID2:
+//         id += (b << 8);
+//         // printf("id: %d\n", (int)id);
+//         state = IPC_SIZE1;
+//         break;
+//       case IPC_SIZE1:
+//         size = b;
+//         state = IPC_SIZE2;
+//         break;
+//       case IPC_SIZE2:
+//         size += (b << 8);
+//         // printf("size: %d\n", (int)size);
+//         state = IPC_CRC;
+//         break;
+//       case IPC_CRC:
+//         crc = b;
+//         // printf("crc: %d\n", (int)crc);
+//         state = IPC_PAYLOAD;
+//         break;
+//       case IPC_PAYLOAD:
+//         uint8_t crc2 = calc_crc(&buffer[i], size-IPC_HEADER_SIZE);
+//         // printf("crc2: %d\n", (int)crc2);
+//         if (crc == crc2) {
+//           ipc::message_t ret(size);
+//           memcpy(ret.data(), &buffer[i-IPC_HEADER_SIZE], size);
 
-  ipc::message_t ret;
-  return std::move(ret);
-}
+//           // pop off the bytes that have been checked and resize
+//           // buffer IF there are still bytes to check
+//           // size_t new_size = buffer.size() - (i-IPC_HEADER_SIZE+size);
+//           // if (new_size > 0) {
+//           //   uint8_t *tmp = new uint8_t[new_size];
+//           //   memcpy(tmp, &buffer[i-IPC_HEADER_SIZE+size], new_size);
+//           //   buffer.resize(new_size);
+//           //   memcpy(buffer.data(), tmp, new_size);
+//           //   delete[] tmp;
+//           // }
 
+//           return std::move(ret);
+//         }
+//         else state = IPC_MAGIC1; // crap, start over
+//         break;
+//     }
+//   }
+//   // no messages in buffer, clear
+//   buffer.clear();
 
-static
-ipc::message_t get_msg(ipc::message_t& buffer) {
-  uint8_t state = IPC_MAGIC1;
-  uint16_t size = 0;
-  uint8_t crc = 0;
-  size_t length = buffer.size();
-  uint16_t id{0};
+//   ipc::message_t ret;
+//   return std::move(ret);
+// }
 
-  for (size_t i=0; i<length; ++i) {
-    uint8_t b = buffer[i];
-    switch(state) {
-      case IPC_MAGIC1:
-        if (b == 0xff) state = IPC_MAGIC2;
-        // printf("state: %d   index: %d  byte: %d\n", (int)state, (int)i, (int)b);
-        break;
-      case IPC_MAGIC2:
-        if (b == 0xff) state = IPC_ID1;
-        else state = IPC_MAGIC1;
-        break;
-      case IPC_ID1:
-        id = b;
-        state = IPC_ID2;
-        break;
-      case IPC_ID2:
-        id += (b << 8);
-        // printf("id: %d\n", (int)id);
-        state = IPC_SIZE1;
-        break;
-      case IPC_SIZE1:
-        size = b;
-        state = IPC_SIZE2;
-        break;
-      case IPC_SIZE2:
-        size += (b << 8);
-        // printf("size: %d\n", (int)size);
-        state = IPC_CRC;
-        break;
-      case IPC_CRC:
-        crc = b;
-        // printf("crc: %d\n", (int)crc);
-        state = IPC_PAYLOAD;
-        break;
-      case IPC_PAYLOAD:
-        uint8_t crc2 = calc_crc(&buffer[i], size-IPC_HEADER_SIZE);
-        // printf("crc2: %d\n", (int)crc2);
-        if (crc == crc2) {
-          ipc::message_t ret(size);
-          memcpy(ret.data(), &buffer[i-IPC_HEADER_SIZE], size);
+// /*
+// Given a message struct, this packs the message and a
+// ipc_header_t into a message_t container to be sent via
+// ipc.
+// */
+// template<typename T>
+// ipc::message_t ipc_pack(const uint8_t msgid, T& m) {
+//   uint16_t size = IPC_HEADER_SIZE + sizeof(T);
 
-          // pop off the bytes that have been checked and resize
-          // buffer IF there are still bytes to check
-          // size_t new_size = buffer.size() - (i-IPC_HEADER_SIZE+size);
-          // if (new_size > 0) {
-          //   uint8_t *tmp = new uint8_t[new_size];
-          //   memcpy(tmp, &buffer[i-IPC_HEADER_SIZE+size], new_size);
-          //   buffer.resize(new_size);
-          //   memcpy(buffer.data(), tmp, new_size);
-          //   delete[] tmp;
-          // }
+//   ipc_header_t hdr{.id=msgid,.size=size};
+//   hdr.crc = calc_crc<T>(&m);
 
-          return std::move(ret);
-        }
-        else state = IPC_MAGIC1; // crap, start over
-        break;
-    }
-  }
-  // no messages in buffer, clear
-  buffer.clear();
+//   ipc::message_t msg(size);
 
-  ipc::message_t ret;
-  return std::move(ret);
-}
+//   memcpy(msg.data(), &hdr, IPC_HEADER_SIZE);
+//   memcpy(msg.data()+7, &m, sizeof(T));
 
-/*
-Given a message struct, this packs the message and a
-ipc_header_t into a message_t container to be sent via
-ipc.
-*/
-template<typename T>
-ipc::message_t ipc_pack(const uint8_t msgid, T& m) {
-  uint16_t size = IPC_HEADER_SIZE + sizeof(T);
+//   return std::move(msg);
+// }
 
-  ipc_header_t hdr{.id=msgid,.size=size};
-  hdr.crc = calc_crc<T>(&m);
-
-  ipc::message_t msg(size);
-
-  memcpy(msg.data(), &hdr, IPC_HEADER_SIZE);
-  memcpy(msg.data()+7, &m, sizeof(T));
-
-  return std::move(msg);
-}
-
-/*
-Given a message_t that contains the ipc_header_t and another
-struct, only the message struct is returned. The
-ipc_header_t is ignored.
-*/
-template<typename T>
-T ipc_unpack(const ipc::message_t& m) {
-  T ret;
-  memcpy(&ret, m.data() + IPC_HEADER_SIZE, sizeof(T));
-  return std::move(ret);
-}
+// /*
+// Given a message_t that contains the ipc_header_t and another
+// struct, only the message struct is returned. The
+// ipc_header_t is ignored.
+// */
+// template<typename T>
+// T ipc_unpack(const ipc::message_t& m) {
+//   T ret;
+//   memcpy(&ret, m.data() + IPC_HEADER_SIZE, sizeof(T));
+//   return std::move(ret);
+// }

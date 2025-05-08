@@ -1,20 +1,16 @@
-#include <stdio.h>
-#include <unistd.h>     // sleep, getpid()
-#include <sys/types.h>  // pid (type int)
 #include <ipc.hpp>
-#include <stdlib.h> // rand
 #include <signal.h> // alarm
+#include <stdio.h>
+#include <stdlib.h>    // rand
+#include <sys/types.h> // pid (type int)
+#include <unistd.h>    // sleep, getpid()
 
-#define __USE_SENSOR_LSM6DSOX__
-#define __USE_SENSOR_LIS3MDL__
-#define __USE_SENSOR_BMP390__
-
-#include "common.h"
 #include "colors.hpp"
+#include "common.h"
 #include "serialcomm.hpp"
 
-#include <gciSensors.hpp>
 #include <common/messages.hpp>
+#include <gciSensors.hpp>
 
 using namespace ipc;
 using namespace std;
@@ -31,8 +27,7 @@ gciLSM6DSOX accel(1);
 gciBMP390 bmp(1);
 sensors::compfilter_t qcf(0.01f);
 
-
-volatile bool run = true;
+volatile bool run      = true;
 volatile bool read_imu = false;
 
 float random(float min, float max) {
@@ -62,7 +57,6 @@ int main() {
   SocketUDP s;
   s.open(1); // 1 msec timeout
 
-
   while (true) {
     uint8_t err = accel.init(ACCEL_RANGE_4_G, GYRO_RANGE_2000_DPS, RATE_208_HZ);
     if (err == 0) break;
@@ -76,7 +70,7 @@ int main() {
 
   uint32_t start_time = 0;
 
-  while(run) {
+  while (run) {
     if (read_imu) {
       lsm6dsox_t i = accel.read();
       if (i.ok == false) continue;
@@ -88,11 +82,11 @@ int main() {
       imu.a = i.a;
       imu.g = i.g;
       // imu.m = i.m;
-      imu.temperature = i.temperature;
-      imu.q = quat_t{1,0,0,0};
+      imu.temperature  = i.temperature;
+      imu.q            = quat_t{1, 0, 0, 0};
       imu.timestamp_us = i.timestamp_us - start_time;
       // imu.timestamp = i.timestamp;
-      message_t msg = ipc_pack<imu_t>(SET_IMU,imu);
+      message_t msg = ipc_pack<imu_t>(SET_IMU, imu);
       s.sendto(msg, addr);
       // printf("%d\r", (int)imu.timestamp);
     }

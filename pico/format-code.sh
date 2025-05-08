@@ -1,3 +1,4 @@
 #!/bin/zsh
 
-clang-format -style=file:../../dotfiles/clang-format.yml -i dev/*.cpp src/*.hpp src/*.cpp
+STYLE=${HOME}/github/dotfiles/clang-format.yml
+clang-format -style=file:${STYLE} -i dev/*.cpp src/*.hpp src/*.cpp

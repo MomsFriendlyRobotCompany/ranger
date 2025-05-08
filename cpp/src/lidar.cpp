@@ -1,17 +1,16 @@
+#include <signal.h> // alarm
 #include <stdio.h>
-#include <unistd.h>     // sleep, getpid()
-#include <sys/types.h>  // pid (type int)
-#include <stdlib.h> // rand
- #include<signal.h> // alarm
+#include <stdlib.h>    // rand
+#include <sys/types.h> // pid (type int)
+#include <unistd.h>    // sleep, getpid()
 
-#include <ipc.hpp>
 #include "common.h"
+#include "ipc.hpp"
 
 using namespace ipc;
 
-
 volatile bool read_lidar = false;
-volatile bool run = true;
+volatile bool run        = true;
 // void signal_func(int sig) { read_lidar = true; }
 
 void signal_func(int sig) {
@@ -39,12 +38,12 @@ int main() {
 
   uint64_t start_time = ipc::time_us();
 
-  while(run) {
+  while (run) {
     if (read_lidar) {
       read_lidar = false;
       lidar_t lidar;
       lidar.timestamp_us = ipc::time_us() - start_time;
-      for (size_t i=99; i > -1; --i) {
+      for (size_t i = 99; i > -1; --i) {
         lidar.points[i].x = 123.456;
         lidar.points[i].y = -123.456;
       }

@@ -1,14 +1,12 @@
 #include <stdio.h>
-#include <unistd.h>     // sleep, getpid()
-#include <sys/types.h>  // pid (type int)
+#include <sys/types.h> // pid (type int)
+#include <unistd.h>    // sleep, getpid()
 
 #include "ipc.hpp"
-#include "signals.hpp"
 #include "message.hpp"
+#include "signals.hpp"
 
 #include "common.h"
-
-
 
 constexpr uint16_t IPC_MSG_TEST = 5;
 
@@ -24,8 +22,6 @@ struct __attribute__((packed)) test_t {
   uint8_t img[5]{0}; // 5 = 13
 };
 
-
-
 int main() {
   ipc::message_t buffer(256);
   // ipc::message_t buffer(UDP_BUFFER_SIZE);
@@ -38,15 +34,15 @@ int main() {
   // printf("size: %d  crc: %d\n",(int)sizeof(t), (int)t.crc);
   ipc::message_t msg = ipc_pack<test_t>(IPC_MSG_TEST, t);
 
-  memcpy(buffer.data()+6, msg.data(), msg.size());
+  memcpy(buffer.data() + 6, msg.data(), msg.size());
 
   memset(t.img, 35, 5);
   msg = ipc_pack<test_t>(IPC_MSG_TEST, t);
-  memcpy(buffer.data()+msg.size()+6+1, msg.data(), msg.size());
+  memcpy(buffer.data() + msg.size() + 6 + 1, msg.data(), msg.size());
 
-  for (int i=1; i<60;++i) {
-    printf("%4d", (int)buffer[i-1]);
-    if (i%10 == 0) printf("\n");
+  for (int i = 1; i < 60; ++i) {
+    printf("%4d", (int)buffer[i - 1]);
+    if (i % 10 == 0) printf("\n");
   }
   printf("\n");
 
@@ -58,14 +54,14 @@ int main() {
     // memcpy(&tt, m.data()+7, sizeof(test_t));
     tt = ipc_unpack<test_t>(m);
     printf("i: %d  d: %d\n", tt.i, tt.d);
-    for (int i=0; i<5; ++i) printf("img[%d]: %d\n",i,(int)tt.img[i]);
+    for (int i = 0; i < 5; ++i)
+      printf("img[%d]: %d\n", i, (int)tt.img[i]);
   }
   printf("buffer size: %d\n", (int)buffer.size());
 
-
-  for (int i=1; i<60;++i) {
-    printf("%4d", (int)buffer[i-1]);
-    if (i%10 == 0) printf("\n");
+  for (int i = 1; i < 60; ++i) {
+    printf("%4d", (int)buffer[i - 1]);
+    if (i % 10 == 0) printf("\n");
   }
   printf("\n");
 
@@ -74,13 +70,13 @@ int main() {
     // memcpy(&tt, m.data(), sizeof(test_t));
     tt = ipc_unpack<test_t>(m);
     printf("i: %d  d: %d\n", tt.i, tt.d);
-    for (int i=0; i<5; ++i) printf("img[%d]: %d\n",i,(int)tt.img[i]);
+    for (int i = 0; i < 5; ++i)
+      printf("img[%d]: %d\n", i, (int)tt.img[i]);
   }
   printf("buffer size: %d\n", (int)buffer.size());
 
   return 0;
 }
-
 
 // uint8_t* get_id(uint8_t* buffer, size_t length, uint16_t& id) {
 //   uint8_t state = IPC_MAGIC1;

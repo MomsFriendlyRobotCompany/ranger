@@ -1,9 +1,10 @@
 ## Setup
 
 ```bash
-cd ranger/cpp
-ln -s ../../ipc/cpp/src ./ipc
-ln -s ../../serialcomm/src/serialcomm ./serialcomm
-ln -s ~/github/gciSensors/src/ ./gciSensors
-ln -s ~/github/squaternion/cpp/src ./squaternions
+cd extlibs
+ln -s ~/github/ipc/cpp ./ipc
+ln -s ~/github/serialcomm ./serialcomm
+ln -s ~/github/gci_sensors ./gci_sensors
+ln -s ~/github/squaternion/cpp ./squaternions
+ln -s ~/github/yivo/cpp ./yivo
 ```
