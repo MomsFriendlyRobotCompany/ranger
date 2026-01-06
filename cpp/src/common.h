@@ -5,7 +5,8 @@
 // #include <stdio.h> // printf
 // #include <stdlib.h>    // rand
 // #include <sys/types.h> // pid (type int)
-// #include <unistd.h>    // sleep, getpid()
+// #include <time.h> // clock_gettime
+// #include <unistd.h>    // sleep
 
 
 constexpr uint16_t LOCAL_IMU_PORT = 9998;
@@ -24,17 +25,39 @@ constexpr uint16_t LOCAL_LIDAR_PORT = 9999;
 // constexpr command_t GET_POSE  = 201;
 // constexpr command_t GET_GPS   = 202;
 
-// struct __attribute__((packed)) point_t {
-//   float x, y;
-// };
 
-// struct __attribute__((packed)) vec_t {
-//   float x, y, z;
-// };
+#define FRAME_BODY 1
+#define FRAME_IMU 10
+#define FRAME_CAMERA 20
 
-// struct __attribute__((packed)) quat_t {
-//   float w, x, y, z;
-// };
+// uint64_t timestamp_us() {
+//   struct timespec ts;
+    
+//   // defined in time.h
+//   // CLOCK_REALTIME  = wall-clock time (Unix timestamp)
+//   // CLOCK_MONOTONIC = time since some unspecified point (not affected by clock changes)
+//   // CLOCK_UPTIME_RAW = ??
+//   if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+//     printf("clock_gettime\n");
+//     return 0;
+//   }
+  
+//   // return (uint64_t)ts.tv_sec * 1000000LL + (uint64_t)(ts.tv_nsec / 1000);
+//   return (uint64_t)ts.tv_nsec;
+// }
+
+struct __attribute__((packed)) header_t {
+  uint16_t frame;
+  uint64_t timestamp_us;
+};
+
+struct __attribute__((packed)) vec_t {
+  float x, y, z;
+};
+
+struct __attribute__((packed)) quat_t {
+  float w, x, y, z;
+};
 
 // struct __attribute__((packed)) pose_t {
 //   vec_t position;
@@ -47,13 +70,13 @@ constexpr uint16_t LOCAL_LIDAR_PORT = 9999;
 //   uint64_t timestamp_us;
 // };
 
-// struct __attribute__((packed)) imu_t {
-//   vec_t a, g, m;
-//   quat_t q;
-//   float temperature;
-//   bool ok;
-//   uint64_t timestamp_us;
-// };
+struct __attribute__((packed)) full_imu_t {
+  header_t header;
+  vec_t a, g, m;
+  quat_t q;
+  float temperature;
+  float pressure;
+};
 
 // enum IPC_STATE: uint8_t {
 //   IPC_MAGIC1,

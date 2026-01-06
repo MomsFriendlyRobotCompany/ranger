@@ -5,12 +5,12 @@
 #include <string>
 #include <ipc/ipc.hpp>
 #include "common.h"
-#include <sensor_msgs.pb.h> // highresimu
-#include <foxglove_msgs.pb.h> // lidar
+// #include <sensor_msgs.pb.h> // highresimu
+// #include <foxglove_msgs.pb.h> // lidar
 
 constexpr int MAX_MSG_SIZE = 100;
 
-using namespace ipc;
+// using namespace ipc;
 using namespace std;
 
 bool run = true;
@@ -23,28 +23,28 @@ struct SharedMemory_t {
   // lidar_t lidar;
 } sm;
 
-void signal_func(int i) {
-  run = false;
-  if (i == SIGINT) printf("\nCtrl-c main\n");
-  else if (i == SIGTERM) printf("\nTerminate main\n");
-  else if (i == SIGKILL) printf("\nKill main\n");
-}
+// void signal_func(int i) {
+//   run = false;
+//   if (i == SIGINT) printf("\nCtrl-c main\n");
+//   else if (i == SIGTERM) printf("\nTerminate main\n");
+//   else if (i == SIGKILL) printf("\nKill main\n");
+// }
 
-void lidar_thread() {
-  SocketUDP sock;
-  sock.open(1000);
-  sock.bind(LOCAL_LIDAR_PORT);
+// void lidar_thread() {
+//   SocketUDP sock;
+//   sock.open(1000);
+//   sock.bind(LOCAL_LIDAR_PORT);
 
-  while (run) {
-    sock.recv();
-  }
-}
+//   while (run) {
+//     sock.recv();
+//   }
+// }
 
 int main() {
   setbuf(stdout, NULL); // don't buffer STDOUT
   printf("hello\n");
 
-  signal(SIGINT, signal_func);
+  // signal(SIGINT, signal_func);
   // signal(SIGTERM, signal_func);
   // signal(SIGKILL, signal_func);
 
@@ -64,23 +64,23 @@ int main() {
   // uint8_t buffer[BUFFER_SIZE];
 
   // defaults to 0.0.0.0
-  inetaddr_t addr = inet_sockaddr(MEMORY_PORT);
+  ipc::inetaddr_t addr = ipc::inet_sockaddr(MEMORY_PORT);
 
 
-  SocketUDP s;
+  ipc::SocketUDP s;
   // s.open(); // no timeout
   bool ok = s.open(1); // timeout
   printf("open: %s\n", ok ? "success":"fail");
   s.bind(addr); 
   uint8_t buffer[MAX_MSG_SIZE];
   uint32_t loop_cnt   = 0;
-  uint64_t start_time = time_us();
+  uint64_t start_time = ipc::time_us();
 
   while (run) {
-    sleep_ms(1000);
+    ipc::sleep_ms(1000);
 
-    printf(".");
-    inetaddr_t client_addr;
+    // printf(".");
+    ipc::inetaddr_t client_addr;
     // memset(buffer, 0, MAX_MSG_SIZE);
     if (s.recvfrom(buffer, MAX_MSG_SIZE, &client_addr) == 0) continue;
     // s.recvfrom(buffer, MAX_MSG_SIZE, &client_addr);
